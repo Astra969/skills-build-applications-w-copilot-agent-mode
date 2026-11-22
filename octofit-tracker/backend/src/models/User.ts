@@ -1,5 +1,6 @@
 import { Schema, model } from 'mongoose';
 
+// User model with required validation for name, email, and fitness goal
 const userSchema = new Schema({
   name: { type: String, required: true },
   email: { type: String, required: true },
