@@ -1,6 +1,7 @@
 import { Activity, Team, User, Workout } from '../models/index.js';
 import mongoose from 'mongoose';
 
+// OctoFit application services: activity tracking, team management, leaderboard, and workout suggestions
 export async function listActivities() {
   const activities = await Activity.find().lean();
   return activities.map((a) => ({
