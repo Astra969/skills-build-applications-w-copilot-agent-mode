@@ -30,19 +30,19 @@ OctoFit Tracker is a three-tier application for a school fitness program. The st
 
 Record your plan here before editing code.
 
-- **Presentation tier decision:** React 19 components with Bootstrap styling for each route (/activities, /teams, /leaderboard, /workouts). Use React Router for navigation, shared API client for backend calls, and accessible ARIA labels. Implement loading states and error boundaries.
+- Presentation tier decision: React 19 components with Bootstrap styling for each route (/activities, /teams, /leaderboard, /workouts). Use React Router for navigation, shared API client for backend calls, and accessible ARIA labels. Implement loading states and error boundaries.
 
-- **Logic tier decision:** Express TypeScript routes with service layer separation. Routes validate input and delegate to services. Services contain business logic (points calculation, leaderboard aggregation, suggestion matching). Error handling returns deliberate 4xx responses for invalid input, never 500 from validation.
+- Logic tier decision: Express TypeScript routes with service layer separation. Routes validate input and delegate to services. Services contain business logic (points calculation, leaderboard aggregation, suggestion matching). Error handling returns deliberate 4xx responses for invalid input, never 500 from validation.
 
-- **Data tier decision:** Mongoose schemas with required field validation. User, Team, Activity, and Workout models enforce constraints at document level. Relationships use ObjectId references. Seed data provides test fixtures for activity patterns and user goals.
+- Data tier decision: Mongoose schemas with required field validation. User, Team, Activity, and Workout models enforce constraints at document level. Relationships use ObjectId references. Seed data provides test fixtures for activity patterns and user goals.
 
-- **Activity tracking approach:** POST /api/activities accepts userId, teamId, type, minutes. Service validates IDs exist, calculates points based on activity type (points = minutes × multiplier). Activity document stores user, team, type, minutes, computed points, and occurredAt timestamp.
+- Activity tracking approach: POST /api/activities accepts userId, teamId, type, minutes. Service validates IDs exist, calculates points based on activity type (points = minutes × multiplier). Activity document stores user, team, type, minutes, computed points, and occurredAt timestamp.
 
-- **Team management approach:** POST /api/teams accepts name, mascot, optional members array. Reject missing name with 400. Members array maintains ObjectId references to User documents. GET /api/teams lists all teams with their members populated.
+- Team management approach: POST /api/teams accepts name, mascot, optional members array. Reject missing name with 400. Members array maintains ObjectId references to User documents. GET /api/teams lists all teams with their members populated.
 
-- **Leaderboard approach:** Service aggregates activities by team, sums points per team, orders descending. Response includes teamName, totalPoints, and 1-based rank index. Lazy-computed at request time from activity collection.
+- Leaderboard approach: Service aggregates activities by team, sums points per team, orders descending. Response includes teamName, totalPoints, and 1-based rank index. Lazy-computed at request time from activity collection.
 
-- **Workout suggestions approach:** Match user's recent activity type to workout suggestions. First suggestion focus aligns with user's fitnessGoal or most common recent activity. Include reason explaining the connection (e.g., "matches your running activities").
+- Workout suggestions approach: Match user's recent activity type to workout suggestions. First suggestion focus aligns with user's fitnessGoal or most common recent activity. Include reason explaining the connection (e.g., "matches your running activities").
 
 ## Test plan
 
