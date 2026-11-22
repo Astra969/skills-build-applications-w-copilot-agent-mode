@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useState } from 'react';
+import { FormEvent, useEffect, useRef, useState } from 'react';
 import { getJson, postJson } from '../api/client.js';
 
 type Profile = { _id?: string; name: string; email: string; role: 'student' | 'teacher'; fitnessGoal: string; team?: { name: string } };
@@ -9,6 +9,8 @@ export default function Profiles() {
   const [profiles, setProfiles] = useState<Profile[]>();
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
+  const [saving, setSaving] = useState(false);
+  const savingRef = useRef(false);
 
   async function loadProfiles() {
     try {
@@ -23,6 +25,9 @@ export default function Profiles() {
 
   async function submitProfile(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (savingRef.current) return;
+    savingRef.current = true;
+    setSaving(true);
     const formElement = event.currentTarget;
     const form = new FormData(formElement);
     try {
@@ -39,6 +44,9 @@ export default function Profiles() {
     } catch {
       setMessage('');
       setError('Unable to create profile. Check the details and try again.');
+    } finally {
+      savingRef.current = false;
+      setSaving(false);
     }
   }
 
@@ -58,7 +66,7 @@ export default function Profiles() {
       </select>
       <label className="form-label" htmlFor="profile-goal">Fitness goal</label>
       <input className="form-control mb-3" id="profile-goal" name="fitnessGoal" required />
-      <button className="btn btn-primary align-self-start" type="submit">Create profile</button>
+      <button className="btn btn-primary align-self-start" type="submit" disabled={saving}>{saving ? 'Saving…' : 'Create profile'}</button>
     </form>
     {message && <p role="status">{message}</p>}
     {error && <p role="alert">{error}</p>}

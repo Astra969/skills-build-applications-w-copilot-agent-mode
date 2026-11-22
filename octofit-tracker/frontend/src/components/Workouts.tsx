@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useState } from 'react';
+import { FormEvent, useEffect, useRef, useState } from 'react';
 import { getJson } from '../api/client.js';
 
 type Workout = { _id?: string; title: string; focus: string; minutes: number; difficulty: string; reason: string };
@@ -8,13 +8,17 @@ export default function Workouts() {
   const [email, setEmail] = useState('mona@example.com');
   const [suggestions, setSuggestions] = useState<Workout[]>();
   const [error, setError] = useState('');
+  const requestId = useRef(0);
 
   async function loadSuggestions(userEmail: string) {
+    const currentRequest = ++requestId.current;
     try {
       const result = await getJson<SuggestionsResponse>(`/api/workouts/suggestions/${encodeURIComponent(userEmail)}`);
+      if (currentRequest !== requestId.current) return;
       setSuggestions(result.suggestions);
       setError('');
     } catch {
+      if (currentRequest !== requestId.current) return;
       setSuggestions(undefined);
       setError('Unable to load workout suggestions. Check the profile email and try again.');
     }

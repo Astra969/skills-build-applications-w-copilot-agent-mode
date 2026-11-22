@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useState } from 'react';
+import { FormEvent, useEffect, useRef, useState } from 'react';
 import { getJson, postJson } from '../api/client.js';
 
 type Team = { _id?: string; name: string; mascot: string; members: string[] };
@@ -9,6 +9,8 @@ export default function Teams() {
   const [teams, setTeams] = useState<Team[]>();
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
+  const [saving, setSaving] = useState(false);
+  const savingRef = useRef(false);
 
   async function loadTeams() {
     try {
@@ -23,6 +25,9 @@ export default function Teams() {
 
   async function submitTeam(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (savingRef.current) return;
+    savingRef.current = true;
+    setSaving(true);
     const formElement = event.currentTarget;
     const form = new FormData(formElement);
     try {
@@ -38,6 +43,9 @@ export default function Teams() {
     } catch {
       setMessage('');
       setError('Unable to create team. Check the member IDs and try again.');
+    } finally {
+      savingRef.current = false;
+      setSaving(false);
     }
   }
 
@@ -52,7 +60,7 @@ export default function Teams() {
       <input className="form-control mb-2" id="team-mascot" name="mascot" required />
       <label className="form-label" htmlFor="team-members">Member user IDs (comma-separated)</label>
       <input className="form-control mb-3" id="team-members" name="members" />
-      <button className="btn btn-primary align-self-start" type="submit">Create team</button>
+      <button className="btn btn-primary align-self-start" type="submit" disabled={saving}>{saving ? 'Saving…' : 'Create team'}</button>
     </form>
     {message && <p role="status">{message}</p>}
     {error && <p role="alert">{error}</p>}

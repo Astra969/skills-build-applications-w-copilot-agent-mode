@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useState } from 'react';
+import { FormEvent, useEffect, useRef, useState } from 'react';
 import { getJson, postJson } from '../api/client.js';
 
 type Activity = { _id?: string; type: string; minutes: number; points: number; occurredAt?: string };
@@ -9,6 +9,8 @@ export default function Activities() {
   const [activities, setActivities] = useState<Activity[]>();
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
+  const [saving, setSaving] = useState(false);
+  const savingRef = useRef(false);
 
   async function loadActivities() {
     try {
@@ -23,6 +25,9 @@ export default function Activities() {
 
   async function submitActivity(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (savingRef.current) return;
+    savingRef.current = true;
+    setSaving(true);
     const formElement = event.currentTarget;
     const form = new FormData(formElement);
     try {
@@ -39,6 +44,9 @@ export default function Activities() {
     } catch {
       setMessage('');
       setError('Unable to record activity. Check the user and team IDs and try again.');
+    } finally {
+      savingRef.current = false;
+      setSaving(false);
     }
   }
 
@@ -55,7 +63,7 @@ export default function Activities() {
       <input className="form-control mb-2" id="activity-type" name="type" required />
       <label className="form-label" htmlFor="activity-minutes">Minutes</label>
       <input className="form-control mb-3" id="activity-minutes" name="minutes" type="number" min="1" required />
-      <button className="btn btn-primary align-self-start" type="submit">Save activity</button>
+      <button className="btn btn-primary align-self-start" type="submit" disabled={saving}>{saving ? 'Saving…' : 'Save activity'}</button>
     </form>
     {message && <p role="status">{message}</p>}
     {error && <p role="alert">{error}</p>}
