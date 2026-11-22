@@ -87,7 +87,6 @@ export async function createUser(input: unknown) {
   if (!isRecord(input)) throw httpError('Profile details are required', 400);
   const name = requireText(input.name, 'name');
   const email = requireText(input.email, 'email').toLowerCase();
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw httpError('email must be valid', 400);
   const fitnessGoal = requireText(input.fitnessGoal, 'fitnessGoal');
   const role = input.role ?? 'student';
   if (role !== 'student' && role !== 'teacher') throw httpError('role must be student or teacher', 400);
