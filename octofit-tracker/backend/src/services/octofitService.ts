@@ -106,12 +106,10 @@ export async function suggestWorkouts(userEmail: string) {
   const recentActivity = await Activity.findOne({ user: user._id }).sort({ occurredAt: -1 }).lean();
   const focus = user.fitnessGoal.trim().toLowerCase();
   const activityType = recentActivity?.type.toLowerCase();
-  const matchesGoal = await Workout.find({ focus: new RegExp(`^${focus.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') }).lean();
-  const matchesActivity = activityType
-    ? await Workout.find({ focus: new RegExp(`^${activityType.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') }).lean()
-    : [];
-  const matchingIds = new Set([...matchesGoal, ...matchesActivity].map((workout) => workout._id.toString()));
   const allWorkouts = await Workout.find().sort({ title: 1 }).lean();
+  const matchingIds = new Set(allWorkouts
+    .filter((workout) => workout.focus.toLowerCase() === focus || workout.focus.toLowerCase() === activityType)
+    .map((workout) => workout._id.toString()));
   const ordered = [...allWorkouts].sort((a, b) => Number(matchingIds.has(b._id.toString())) - Number(matchingIds.has(a._id.toString())));
   return ordered.slice(0, 3).map((workout) => ({
     ...workout,
